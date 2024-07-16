@@ -9,7 +9,7 @@ module.exports = {
       latitude: {
         type: Sequelize.FLOAT(11, 5),
       },
-      longtitude: {
+      longitude: {
         type: Sequelize.FLOAT(11, 5),
       },
       name: {

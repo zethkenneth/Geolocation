@@ -22,31 +22,66 @@ Before you begin, ensure you have met the following requirements:
 
 ## Installation
 
-To install this application, follow these steps:
+#### Install MySQL
 
-1. Clone the repository:
+Follow the instructions below based on your operating system:
 
-   ```bash
-   git clone https://github.com/zethkenneth/Geolocation.git
-   ```
+**For Windows:**
 
-2. Navigate to the project directory:
+1. Download and install the MySQL Community Server from the [MySQL website](https://dev.mysql.com/downloads/mysql/).
+2. During the installation, note down the root password you set up.
+3. After installation, open the MySQL Command Line Client and log in with the root password.
 
-   ```bash
-   cd Geolocation
-   ```
+**For macOS:**
 
-3. Install the dependencies:
+1. Install MySQL using Homebrew:
 
    ```bash
-   npm install
+   brew install mysql
    ```
 
-## Database Setup
+2. Start the MySQL service:
 
-This application uses [Sequelize](https://sequelize.org/) as the ORM to interact with the database. Follow these steps to set up the database:
+   ```bash
+   brew services start mysql
+   ```
 
-1. Create a `.env` file in the root of your project and add your database configuration:
+3. Secure your MySQL installation and set up the root password:
+
+   ```bash
+   mysql_secure_installation
+   ```
+
+**For Ubuntu/Linux:**
+
+1. Update your package index and install MySQL:
+
+   ```bash
+   sudo apt update
+   sudo apt install mysql-server
+   ```
+
+2. Secure your MySQL installation and set up the root password:
+
+   ```bash
+   sudo mysql_secure_installation
+   ```
+
+#### Configure the Database
+
+1. Log in to MySQL as the root user:
+
+   ```bash
+   mysql -u root -p
+   ```
+
+2. Create a new database:
+
+   ```sql
+   CREATE DATABASE geo_db;
+   ```
+
+3. Create a `.env` file in the root of your project and add your database configuration:
 
    ```env
    DB_USERNAME=your_db_username
@@ -55,13 +90,13 @@ This application uses [Sequelize](https://sequelize.org/) as the ORM to interact
    DB_HOST=your_db_host
    ```
 
-2. Migrate the database:
+4. Migrate the database:
 
    ```bash
     npm run db_migration
    ```
 
-3. Seed the database:
+5. Seed the database:
 
    ```bash
    npm run db_seed
@@ -80,11 +115,12 @@ To use this application, follow these steps:
 2. Open your postman use this curl
 
    ```bash
-   curl --location 'http://localhost:3000/geolocation/geo/find_treasure' \
-   --header 'Content-Type: application/json' \
-   --data '{
-       "lat":  37.8136,
-       "lon": 144.9631 ,
-       "dist": 10
-   }'
+      curl --location 'http://localhost:3000/geolocation/geo/find_treasure' \
+      --header 'Content-Type: application/json' \
+      --data '{
+         "latitude":  14.552036595352455,
+         "longitude": 121.01696118771324,
+         "distance": 1,
+         "prizeValue": 17
+      }'
    ```

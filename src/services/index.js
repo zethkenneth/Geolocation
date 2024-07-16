@@ -1,62 +1,71 @@
+const db = require("../core/helper/sequelize.js")
+const { QueryTypes } = require("sequelize");
 
-const haversine = require("haversine");
-// const haversine = require("haversine-distance");
-const geolib = require("geolib");
-const { QueryTypes, Sequelize } = require("sequelize");
-
-const sequelize = new Sequelize("geo_db", "root", "rootpassword", {
-  host: "localhost",
-  dialect: "mysql", // or 'mysql', 'sqlite', 'mariadb', 'mssql'
-});
-
-function getDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Radius of the Earth in kilometers
-  const dLat = (lat2 - lat1) * (Math.PI / 180);
-  const dLon = (lon2 - lon1) * (Math.PI / 180);
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const toRad = (value) => (value * Math.PI) / 180;
+  const R = 6371; // Radius of the Earth in km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * (Math.PI / 180)) *
-      Math.cos(lat2 * (Math.PI / 180)) *
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c; // Distance in kilometers
-  return distance;
-}
+  return R * c;
+};
 
 module.exports = {
   geoLoc: async (data) => {
-    try {
-
-    const { lat, lon, dist, prize } = data.body;
-
-    const treasureBoxes = await sequelize.query(
-      "SELECT * FROM geo_db.Treasures INNER JOIN geo_db.Money_values ON geo_db.Treasures.id = geo_db.Money_values.treasure_id",
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
-
+    const { lat, lon, dist, prize } = data;
 
     const userLocation = {
-        latitude: lat,
-        longtitude: lon
+      latitude: lat,
+      longitude: lon,
     };
 
-    const result = treasureBoxes.filter(async (box) => {
-      const boxLocation = {
-        latitude: box.latitude,
-        longitude: box.longitude,
-      };
+    try {
 
-      const distance = getDistance(lat, lon, box.latitude, box.longitude);    
-      return distance;
-    });
+      const treasureBoxes = await db.query("SELECT * FROM geo_db.Treasures INNER JOIN geo_db.Money_values ON geo_db.Treasures.id = geo_db.Money_values.treasure_id",
+        {
+          type: QueryTypes.SELECT,
+        }
+      )
+      
+      const prizes = [];
+        treasureBoxes.forEach((box) => {
+          const distance = calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            box.latitude,
+            box.longitude
+          );
+
+          const isWithinDistance = distance <= dist;
+          const hasValidPrize = prize === undefined || box.amt >= prize;
+
+          let t;
+          
+          if (isWithinDistance && hasValidPrize) {
+            t = {
+              treasure_name: box.name,
+              treasure_price: box.amt,
+            };
+          } else{
+            return;
+          }
+
+          if (t) {
+            prizes.push(t);
+          }
+        });
 
 
-      return result;
+      return prizes;
     } catch (error) {
-      return error;
+      console.log("Error", error);      
+      return error
     }
   }
 };

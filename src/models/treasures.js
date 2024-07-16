@@ -18,9 +18,13 @@ module.exports = (sequelize, DataTypes) => {
   }
   Treasures.init(
     {
-      id: DataTypes.INTEGER,
+      id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
       latitude: DataTypes.FLOAT(11, 10),
-      longtitude: DataTypes.FLOAT(11, 10),
+      longitude: DataTypes.FLOAT(11, 10),
       name: DataTypes.STRING,
     },
     {
