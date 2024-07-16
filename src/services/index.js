@@ -49,15 +49,7 @@ module.exports = {
         longitude: box.longitude,
       };
 
-      const distance = getDistance(lat, lon, box.latitude, box.longitude);
-
-      console.log(distance);
-        
-      // const distance =  geolib.getDistance(
-      //   boxLocation, 
-      //   userLocation 
-      // );
-
+      const distance = getDistance(lat, lon, box.latitude, box.longitude);    
       return distance;
     });
 

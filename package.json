@@ -4,7 +4,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "db_migration": "npx sequelize-cli db:migrate",
+    "db_migration_undo": "npx sequelize-cli db:migrate:undo:all",
+    "db_seed": "npx sequelize-cli db:seed:all"
   },
   "keywords": [],
   "author": "",
